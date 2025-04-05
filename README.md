@@ -29,6 +29,9 @@ npm install
 npx ionic build
 npx cap sync
 
+## Ejecutar en navegador (modo desarrollo)
+- ionic serve
+
 ## Ejecutar en Android
 Opción 1: Con Android Studio
 - npx cap open android
@@ -55,6 +58,10 @@ Opción 2: Solo con la terminal (sin Android Studio)
     Selecciona un emulador o dispositivo físico
 
     Haz clic en Run ▶ para compilar y ejecutar
+
+    NOTA: Asegúrarse de tener Xcode instalado y una cuenta de desarrollador Apple configurada.
+    NOTA: No cuento con el entorno necesario para probar su funcionamiento en iOS, pero se desarrollo con
+          todos los estandares para que se pudiera compilar y ejecutar en dicho S.O
 
 ## Notas adicionales
 Los archivos de build (android/build, android/app/build) están excluidos del repositorio con .gitignore.
