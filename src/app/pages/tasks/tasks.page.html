@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Tareas</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label>Categoría</ion-label>
+    <ion-select [value]="selectedCategoryId" (ionChange)="onCategoryChange($event.detail.value)">
+      <ion-select-option [value]="null">Todas</ion-select-option>
+      <ion-select-option *ngFor="let cat of categories" [value]="cat.id">
+        {{ cat.name }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-list *ngIf="filteredTasks.length > 0; else noTasks">
+    <ion-item *ngFor="let task of filteredTasks">
+      <ion-label [ngClass]="{ 'completed-task': task.completed }">
+        <h2>{{ task.title }}</h2>
+        <p>{{ task.description }}</p>
+        <ion-note color="medium">Categoría: {{ getCategoryName(task.categoryId) }}</ion-note>
+      </ion-label>
+      <ion-buttons slot="end" class="end-actions">
+        <div class="checkbox-inline">
+          <ion-text class="checkbox-label">Tarea completada</ion-text>
+          <ion-checkbox
+            [checked]="task.completed"
+            (ionChange)="toggleComplete(task)">
+          </ion-checkbox>
+        </div>
+        <ion-button fill="clear" color="danger" (click)="deleteTask(task.id)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+  <ng-template #noTasks>
+    <ion-text color="medium">
+      <p>No hay tareas para esta categoría.</p>
+    </ion-text>
+  </ng-template>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openAddTaskModal()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+

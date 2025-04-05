@@ -1,0 +1,83 @@
+import { Component } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular';
+import { v4 as uuidv4 } from 'uuid';
+import { ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
+
+@Component({
+  standalone: false,
+  selector: 'app-add-task',
+  templateUrl: './add-task.component.html',
+  styleUrls: ['./add-task.component.scss'],
+})
+export class AddTaskComponent {
+  title: string = '';
+  description: string = '';
+  categoryId: string = '';
+  categories: any[] = [];
+
+  constructor(
+    private modalCtrl: ModalController,
+    private storage: Storage,
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController
+  ) {}
+
+  async ionViewWillEnter() {
+    const storedCategories = await this.storage.get('categories');
+    this.categories = storedCategories || [];
+  }
+
+  async showToast(message: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      color: 'success',
+      position: 'bottom'
+    });
+    await toast.present();
+  }
+
+  async showAlert(message: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+  
+  async addTask() {
+    if (!this.title.trim() || !this.description.trim() || !this.categoryId) {
+      const mensaje = !this.title.trim()
+      ? 'El título es obligatorio.'
+      : !this.description.trim()
+      ? 'La descripción es obligatoria.'
+      : 'Debes seleccionar una categoría.';
+
+    await this.showAlert(mensaje);
+    return;
+    }
+
+    const newTask = {
+      id: Date.now(),
+      title: this.title,
+      description: this.description,
+      categoryId: this.categoryId,
+      completed: false,
+    };
+
+    const tasks = (await this.storage.get('tasks')) || [];
+    tasks.push(newTask);
+    await this.storage.set('tasks', tasks);
+
+    await this.showToast('Tarea guardada exitosamente');
+    this.modalCtrl.dismiss({ reload: true });
+  }
+
+  close() {
+    this.modalCtrl.dismiss();
+  }
+}
+

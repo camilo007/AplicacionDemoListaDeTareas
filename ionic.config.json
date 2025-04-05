@@ -1,7 +1,8 @@
 {
   "name": "todotask",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {},
+    "cordova": {}
   },
   "type": "angular"
 }
