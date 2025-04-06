@@ -2,6 +2,66 @@
 
 Aplicación de lista de tareas desarrollada con Ionic + Angular. Compatible con Android e iOS usando Cordova.
 
+## Cambios realizados en la aplicación
+Funcionalidades implementadas
+    Gestión de tareas
+
+        Crear nuevas tareas con nombre y categoría.
+
+        Marcar tareas como completadas o pendientes.
+
+        Eliminar tareas existentes.
+
+        Filtrar tareas por categoría.
+
+    Gestión de categorías
+
+        Crear nuevas categorías personalizadas.
+
+        Editar nombre de categorías existentes.
+
+        Eliminar categorías no utilizadas.
+
+        Asignar categorías a tareas.
+
+    Persistencia de datos
+
+        Implementación de almacenamiento local usando Ionic Storage.
+
+        Los datos de tareas y categorías se guardan incluso después de cerrar la aplicación.
+
+    Integración con Firebase
+
+        Se integró Firebase Remote Config para activar o desactivar funcionalidades de manera remota.
+
+    Compatibilidad móvil
+
+        Proyecto preparado para ejecutarse en dispositivos Android físicos usando Capacitor.
+
+        Soporte para live reload durante el desarrollo (ionic cap run android -l --external).
+
+## Configuración y optimización técnica
+Configuración de environment.ts y environment.prod.ts para separar entornos.
+
+Modularización del código para mantener la escalabilidad.
+
+Optimización del rendimiento en:
+
+    Carga inicial (lazy loading, uso eficiente de módulos).
+
+    Grandes volúmenes de tareas (uso de trackBy, manejo eficiente del DOM).
+
+    Uso de memoria (eliminación de referencias innecesarias y suscripciones activas).
+
+## Calidad y mantenibilidad
+
+Código desarrollado de forma limpia, reutilizable y documentado.
+
+Separación entre lógica de UI y lógica de negocio.
+
+Pruebas manuales continuas en diferentes escenarios.
+
+Uso de buenas prácticas con Angular, Ionic y TypeScript.
 ## Requisitos previos
 Node.js (versión recomendada: 18.x o superior)
 
