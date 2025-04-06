@@ -44,6 +44,8 @@ Opción 1: Con Android Studio
     Haz clic en Run ▶ para compilar y ejecutar
 
 Opción 2: Solo con la terminal (sin Android Studio)
+- en consola: Ionic build
+- en consola: npx cap copy android
 - en consola del proyecto:
     cd android
     ./gradlew assembleDebug

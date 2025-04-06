@@ -11,10 +11,21 @@ import { AppRoutingModule } from './app-routing.module';
 import { AddTaskComponent } from './modals/add-task/add-task.component';
 import { AddCategoryComponent } from './modals/add-category/add-category.component';
 
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireRemoteConfigModule } from '@angular/fire/compat/remote-config';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent,AddTaskComponent,AddCategoryComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot(), FormsModule],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(), 
+    AppRoutingModule, 
+    IonicStorageModule.forRoot(), 
+    FormsModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFireRemoteConfigModule,
+  ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })

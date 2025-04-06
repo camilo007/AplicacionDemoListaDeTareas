@@ -4,7 +4,7 @@ import { Storage } from '@ionic/storage-angular';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
-
+import { RemoteConfigService } from '../../services/remote-config.service';
 @Component({
   standalone: false,
   selector: 'app-add-task',
@@ -16,17 +16,36 @@ export class AddTaskComponent {
   description: string = '';
   categoryId: string = '';
   categories: any[] = [];
+  featureEnabled: boolean = true; 
 
   constructor(
     private modalCtrl: ModalController,
     private storage: Storage,
     private toastCtrl: ToastController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private remoteConfigService: RemoteConfigService
   ) {}
 
   async ionViewWillEnter() {
     const storedCategories = await this.storage.get('categories');
     this.categories = storedCategories || [];
+    this.featureEnabled = await this.remoteConfigService.getFeatureFlag('feature_add_task');
+
+
+    if (!this.featureEnabled) {
+      const alert = await this.alertCtrl.create({
+        header: 'Funcionalidad desactivada',
+        message: 'La opción para agregar tareas no está disponible en este momento.',
+        buttons: [{
+          text: 'OK',
+          handler: () => {
+            this.close();
+          }
+        }]
+      });
+      await alert.present();
+      console.log(this.featureEnabled)
+    }
   }
 
   async showToast(message: string) {
