@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
-import { Task } from '../models/task.model';
-import { Category } from '../models/category.model';
+import { Task } from '../../domain/models/task.model';
+import { Category } from '../../domain/models/category.model';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({

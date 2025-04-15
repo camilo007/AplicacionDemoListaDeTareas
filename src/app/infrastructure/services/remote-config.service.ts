@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireRemoteConfig } from '@angular/fire/compat/remote-config';
-import { environment } from '../../environments/environment'; 
+import { environment } from '../../../environments/environment'; 
 
 @Injectable({
   providedIn: 'root'

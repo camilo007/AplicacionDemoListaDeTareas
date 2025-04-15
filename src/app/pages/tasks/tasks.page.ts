@@ -4,6 +4,11 @@ import { Storage } from '@ionic/storage-angular';
 import { v4 as uuidv4 } from 'uuid';
 import { AddTaskComponent } from 'src/app/modals/add-task/add-task.component';
 import { ToastController } from '@ionic/angular';
+import { GetTasksUseCase } from '../../domain/usecases/get-tasks.usecase';
+import { LocalTaskRepository } from '../../infrastructure/repositories/local-task.repository';
+import { Task } from '../../domain/models/task.model';
+import { ToggleCompleteTaskUseCase } from '../../domain/usecases/toggle-complete-task.usecase';
+import { DeleteTaskUseCase } from '../../domain/usecases/delete-task.usecase';
 
 @Component({
   selector: 'app-home',
@@ -17,12 +22,20 @@ export class TasksPage implements OnInit {
   categories: any[] = [];
   selectedCategoryId: number | null = null;
   private _storage: Storage | null = null;
+  private getTasksUseCase: GetTasksUseCase;
+  private toggleCompleteUseCase: ToggleCompleteTaskUseCase;
+  private deleteTaskUseCase: DeleteTaskUseCase;
 
   constructor(
     private storage: Storage,
     private modalController: ModalController,
-    private toastCtrl: ToastController
-  ) {}
+    private toastCtrl: ToastController,
+    private taskRepository: LocalTaskRepository
+  ) {
+    this.getTasksUseCase = new GetTasksUseCase(this.taskRepository);
+    this.toggleCompleteUseCase = new ToggleCompleteTaskUseCase(this.taskRepository);
+    this.deleteTaskUseCase = new DeleteTaskUseCase(this.taskRepository);
+  }
 
   async ngOnInit() {
     this._storage = await this.storage.create();
@@ -31,8 +44,7 @@ export class TasksPage implements OnInit {
   }
 
   async loadTasks() {
-    const storedTasks = await this._storage?.get('tasks');
-    this.tasks = storedTasks || [];
+    this.tasks = await this.getTasksUseCase.execute();
     this.filterTasks();
   }
 
@@ -70,13 +82,8 @@ export class TasksPage implements OnInit {
   }
 
   async toggleComplete(task: any) {
-    const index = this.tasks.findIndex((t: any) => t.id === task.id);
-    if (index > -1) {
-      this.tasks[index].completed = !this.tasks[index].completed;
-      await this._storage?.set('tasks', this.tasks);
-      this.filterTasks(); 
-    }
-  
+    await this.toggleCompleteUseCase.execute(task.id);
+    await this.loadTasks();
     const toast = await this.toastCtrl.create({
       message: task.completed ? 'Tarea completada' : 'Tarea marcada como pendiente',
       duration: 1500,
@@ -85,11 +92,11 @@ export class TasksPage implements OnInit {
     await toast.present();
   }
 
-  async deleteTask(taskId: number) {
-    this.tasks = this.tasks.filter((t: any) => t.id !== taskId);
-    await this._storage?.set('tasks', this.tasks);
-    this.filterTasks(); 
-  }  
+  async deleteTask(taskId: string) {
+    await this.deleteTaskUseCase.execute(taskId);
+    await this.loadTasks();
+  }
+  
 
   async openAddTaskModal() {
     const modal = await this.modalController.create({

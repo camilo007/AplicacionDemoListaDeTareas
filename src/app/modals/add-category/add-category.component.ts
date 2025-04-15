@@ -4,6 +4,10 @@ import { Storage } from '@ionic/storage-angular';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
+import { Category } from '../../domain/models/category.model';
+import { AddCategoryUseCase } from '../../domain/usecases/add-category.usecase';
+import { LocalCategoryRepository } from '../../infrastructure/repositories/local-category.repository';
+
 
 @Component({
   selector: 'app-add-category',
@@ -13,13 +17,17 @@ import { AlertController } from '@ionic/angular';
 })
 export class AddCategoryComponent {
   name: string = '';
+  private addCategoryUseCase: AddCategoryUseCase;
 
   constructor(
     private modalCtrl: ModalController,
     private storage: Storage,
     private toastCtrl: ToastController,
-    private alertCtrl: AlertController
-  ) {}
+    private alertCtrl: AlertController,
+    private categoryRepository: LocalCategoryRepository
+  ) {
+    this.addCategoryUseCase = new AddCategoryUseCase(this.categoryRepository);
+  }
 
   async showToast(message: string) {
     const toast = await this.toastCtrl.create({
@@ -47,14 +55,11 @@ export class AddCategoryComponent {
     }
 
     const newCategory = {
-      id: Date.now(),
+      id: uuidv4(),
       name: this.name.trim(),
     };
 
-    const categories = (await this.storage.get('categories')) || [];
-    categories.push(newCategory);
-    await this.storage.set('categories', categories);
-
+    await this.addCategoryUseCase.execute(newCategory);
     await this.showToast('Categoría guardada exitosamente');
     this.modalCtrl.dismiss({ reload: true });
 

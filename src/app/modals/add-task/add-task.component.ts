@@ -4,7 +4,10 @@ import { Storage } from '@ionic/storage-angular';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
-import { RemoteConfigService } from '../../services/remote-config.service';
+import { RemoteConfigService } from '../../infrastructure/services/remote-config.service';
+import { AddTaskUseCase } from '../../domain/usecases/add-task.usecase';
+import { Task } from '../../domain/models/task.model';
+import { LocalTaskRepository } from '../../infrastructure/repositories/local-task.repository';
 @Component({
   standalone: false,
   selector: 'app-add-task',
@@ -18,13 +21,18 @@ export class AddTaskComponent {
   categories: any[] = [];
   featureEnabled: boolean = true; 
 
+  private addTaskUseCase: AddTaskUseCase;
+
   constructor(
     private modalCtrl: ModalController,
     private storage: Storage,
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
-    private remoteConfigService: RemoteConfigService
-  ) {}
+    private remoteConfigService: RemoteConfigService,    
+    private taskRepository: LocalTaskRepository 
+  ) {
+    this.addTaskUseCase = new AddTaskUseCase(this.taskRepository);
+  }
 
   async ionViewWillEnter() {
     const storedCategories = await this.storage.get('categories');
@@ -80,16 +88,15 @@ export class AddTaskComponent {
     }
 
     const newTask = {
-      id: Date.now(),
+      id: uuidv4(),
       title: this.title,
       description: this.description,
       categoryId: this.categoryId,
       completed: false,
+      createdAt: Date.now(),
     };
 
-    const tasks = (await this.storage.get('tasks')) || [];
-    tasks.push(newTask);
-    await this.storage.set('tasks', tasks);
+    await this.addTaskUseCase.execute(newTask);
 
     await this.showToast('Tarea guardada exitosamente');
     this.modalCtrl.dismiss({ reload: true });

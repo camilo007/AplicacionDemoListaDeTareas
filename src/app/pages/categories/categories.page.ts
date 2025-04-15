@@ -3,6 +3,10 @@ import { ModalController } from '@ionic/angular';
 import { AddCategoryComponent } from '../../modals/add-category/add-category.component';
 import { Storage } from '@ionic/storage-angular';
 import { EditCategoryComponent } from 'src/app/modals/edit-category/edit-category.component';
+import { GetCategoriesUseCase } from 'src/app/domain/usecases/get-categories.usecase';
+import { DeleteCategoryUseCase } from 'src/app/domain/usecases/delete-category.usecase';
+import { LocalCategoryRepository } from 'src/app/infrastructure/repositories/local-category.repository';
+import { Category } from 'src/app/domain/models/category.model';
 
 @Component({
   standalone: false,
@@ -13,10 +17,17 @@ import { EditCategoryComponent } from 'src/app/modals/edit-category/edit-categor
 export class CategoriesPage implements OnInit {
   categories: any[] = [];
 
+  private getCategoriesUseCase: GetCategoriesUseCase;
+  private deleteCategoryUseCase: DeleteCategoryUseCase;
+
   constructor(
     private modalCtrl: ModalController,
-    private storage: Storage
-  ) {}
+    private storage: Storage,
+    private categoryRepository: LocalCategoryRepository
+  ) {
+    this.getCategoriesUseCase = new GetCategoriesUseCase(this.categoryRepository);
+    this.deleteCategoryUseCase = new DeleteCategoryUseCase(this.categoryRepository);
+  }
 
   async ngOnInit() {
     await this.loadCategories();
@@ -31,11 +42,9 @@ export class CategoriesPage implements OnInit {
     this.categories = stored || [];
   }
 
-  async deleteCategory(categoryId: number) {
-    const categories = await this.storage.get('categories') || [];
-    const updated = categories.filter((cat: any) => cat.id !== categoryId);
-    await this.storage.set('categories', updated);
-    this.categories = updated;
+  async deleteCategory(categoryId: string) {
+    await this.deleteCategoryUseCase.execute(categoryId);
+    this.categories = await this.getCategoriesUseCase.execute();
   }
   
 
